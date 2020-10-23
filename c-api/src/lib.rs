@@ -46,6 +46,25 @@ pub unsafe extern "C" fn salty_sign(
 }
 
 #[no_mangle]
+/// Signs the data, based on the keypair generated from the secret seed.
+pub unsafe extern "C" fn salty_sign2(
+    seed: &[u8; SECRETKEY_SEED_LENGTH],
+    data1_ptr: *const u8,
+    data1_len: usize,
+    data2_ptr: *const u8,
+    data2_len: usize,
+    signature: &mut [u8; SIGNATURE_SERIALIZED_LENGTH],
+) {
+    let keypair = Keypair::from(seed);
+    let data1 = core::slice::from_raw_parts(data1_ptr, data1_len);
+    let data2 = core::slice::from_raw_parts(data2_ptr, data2_len);
+
+    signature.copy_from_slice(
+        &keypair.sign2(data1, data2).to_bytes()
+    );
+}
+
+#[no_mangle]
 /// Signs the data for a given context, based on the keypair generated
 /// from the secret seed.
 pub unsafe extern "C" fn salty_sign_with_context(

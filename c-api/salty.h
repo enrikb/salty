@@ -61,6 +61,17 @@ void salty_sign(const uint8_t (*seed)[salty_SECRETKEY_SEED_LENGTH],
                 const uint8_t *data_ptr,
                 uintptr_t data_len,
                 uint8_t (*signature)[salty_SIGNATURE_SERIALIZED_LENGTH]);
+/**
+ * Signs the concatenated data, based on the keypair generated from the secret
+ * seed.
+ */
+void salty_sign2(const uint8_t (*seed)[salty_SECRETKEY_SEED_LENGTH],
+                 const uint8_t *data1_ptr,
+                 uintptr_t data1_len,
+                 const uint8_t *data2_ptr,
+                 uintptr_t data2_len,
+                 uint8_t (*signature)[salty_SIGNATURE_SERIALIZED_LENGTH]);
+
 
 /**
  * Signs the data for a context, based on the keypair generated from the secret seed.

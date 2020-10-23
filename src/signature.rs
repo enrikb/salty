@@ -92,6 +92,35 @@ impl Keypair {
         Signature { r: R, s }
     }
 
+    pub fn sign2(&self, mpart1: &[u8], mpart2: &[u8]) -> Signature {
+
+        // R = rB, with r = H(nonce, M)
+        let first_hash = Sha512::new()
+            .updated(&self.secret.nonce)
+            .updated(mpart1)
+            .updated(mpart2)
+            .finalize();
+
+        let r: Scalar = Scalar::from_u512_le(&first_hash);
+        #[allow(non_snake_case)]
+        let R: CompressedY = (&r * &CurvePoint::basepoint()).compressed();
+
+
+        // S = r + H(R, A, M)s (mod l), with A = sB the public key
+        let second_hash = Sha512::new()
+            .updated(&R.0)
+            .updated(&self.public.compressed.0)
+            .updated(mpart1)
+            .updated(mpart2)
+            .finalize();
+
+        let h: Scalar = Scalar::from_u512_le(&second_hash);
+        let s = &r.into() + &(&h.into() * &self.secret.scalar);
+
+        Signature { r: R, s }
+    }
+
+
     pub fn sign_with_context(&self, message: &[u8], context: &[u8])
     -> Signature {
         // By default, the context is an empty string.
