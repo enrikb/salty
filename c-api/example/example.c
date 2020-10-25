@@ -39,6 +39,19 @@ int main(void) {
 
     printf("signature generated, verify returns: %d\n", err);
 
+    /*
+     * non-contiguous two part message example
+     * the message is treated as one logical message!
+     */
+    const uint8_t part1 [] = "salt";
+    const uint8_t part2 [] = "y!";
+
+    memset(signature, 0, sizeof(signature));
+    salty_sign2(&seed, part1, strlen((const char*) part1), part2, strlen((const char*) part2), &signature);
+    err = salty_verify(&public_key, data, strlen((const char*) data), &signature);
+
+    printf("signature generated, verify returns: %d\n", err);
+
     /* let keypair = salty::Keypair::from(&seed); */
 
     /* let data = "salty!".as_bytes(); */
