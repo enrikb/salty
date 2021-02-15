@@ -180,6 +180,17 @@ impl ProjectivePoint {
     }
 }
 
+#[cfg(haase)]
+fn reduce(fe: &mut FieldElement)
+{
+    FieldElement::reduce_completely(fe);
+}
+
+#[cfg(not(haase))]
+fn reduce(_fe: &mut FieldElement)
+{
+}
+
 /// Perform the double-and-add step of the Montgomery ladder.
 ///
 /// Given projective points
@@ -201,9 +212,11 @@ fn differential_add_and_double(
     affine_PmQ: &FieldElement,
 ) {
     let t0 = &P.U + &P.W;
-    let t1 = &P.U - &P.W;
+    let mut t1 = &P.U - &P.W;
+    reduce(&mut t1);
     let t2 = &Q.U + &Q.W;
-    let t3 = &Q.U - &Q.W;
+    let mut t3 = &Q.U - &Q.W;
+    reduce(&mut t3);
 
     let t4 = t0.squared();   // (U_P + W_P)^2 = U_P^2 + 2 U_P W_P + W_P^2
     let t5 = t1.squared();   // (U_P - W_P)^2 = U_P^2 - 2 U_P W_P + W_P^2
